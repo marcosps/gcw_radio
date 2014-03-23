@@ -133,12 +133,8 @@ static void finish_app()
 		mixer_control(BYPASS_TURN_OFF, NULL, NULL, NULL);
 
 		/* Turn off the cature mode */
-		if (is_gcw()) {
-			mixer_control(HEADPHONE_TURN_OFF, NULL, NULL, NULL);
-			mixer_control(SPEAKER_TURN_OFF, NULL, NULL, NULL);
-		} else {
-			mixer_control(TURN_OFF, NULL, NULL, NULL);
-		}
+		mixer_control(HEADPHONE_TURN_OFF, NULL, NULL, NULL);
+		mixer_control(SPEAKER_TURN_OFF, NULL, NULL, NULL);
 	}
 
 	TTF_CloseFont(freq_font);
@@ -288,9 +284,8 @@ int main(int argc, char* argv[])
 
 		int mode = TURN_ON;
 
-		if (is_gcw())
-			/* we can get HEADPHONE or SPEAKER from handle */
-			handle_mode(MODE_GET, &mode);
+		/* we can get HEADPHONE or SPEAKER from handle */
+		handle_mode(MODE_GET, &mode);
 
 		/* Set the flag to turn on the capture line */
 		mixer_control(mode, &vol, &min, &max);
@@ -378,7 +373,7 @@ int main(int argc, char* argv[])
 					handle_user_freq(FILE_FREQ_WRITE, &freq);
 
 				/* Y Button -> Turn on Headphone */
-				} else if (is_gcw() && !strcmp(button_pressed, "space")) {
+				} else if (!strcmp(button_pressed, "space")) {
 					mixer_control(SPEAKER_TURN_OFF
 							, &vol
 							, &min
@@ -392,7 +387,7 @@ int main(int argc, char* argv[])
 					handle_mode(MODE_SET, &mode);
 
 				/* A Button - Turn on Speaker */
-				} else if (is_gcw() && !strcmp(button_pressed, "left ctrl")) {
+				} else if (!strcmp(button_pressed, "left ctrl")) {
 					mixer_control(HEADPHONE_TURN_OFF
 							, &vol
 							, &min

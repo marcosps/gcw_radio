@@ -74,12 +74,3 @@ enum device {
 	DINGOO_A320,
 	GCW
 };
-
-/* Current Device - This could be DINGOO_A320 or GCW */
-int current_device;
-
-/* this return 1 if the current device is GCW */
-int is_gcw();
-
-/* this return 1 if the current device is DINGOO_A320 */
-int is_dingooa320();

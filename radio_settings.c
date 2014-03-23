@@ -30,42 +30,6 @@ static struct v4l2_frequency freq;
 static struct v4l2_tuner tuner;
 static struct v4l2_hw_freq_seek seek;
 
-/* discover what is the current device */
-void set_current_device(void)
-{
-	snd_mixer_selem_id_t *sid;
-	snd_mixer_t *handle;
-	snd_mixer_elem_t *elem;
-
-	snd_mixer_selem_id_alloca(&sid);
-	snd_mixer_selem_id_set_index(sid, 0);
-
-	snd_mixer_open(&handle, 0);
-	snd_mixer_attach(handle, "default");
-	snd_mixer_selem_register(handle, NULL, NULL);
-	snd_mixer_load(handle);
-
-	snd_mixer_selem_id_set_name(sid, "Line");
-	elem = snd_mixer_find_selem(handle, sid);
-
-	/* just Dingoo A320 has the Line attribute */
-	current_device = (elem) ? DINGOO_A320 :	GCW;
-
-	printf("Current device == %d\n", current_device);
-}
-
-/* this return 1 if the current device is GCW */
-int is_gcw()
-{
-        return current_device == GCW;
-}
-
-/* this return 1 if the current device is DINGOO_A320 */
-int is_dingooa320()
-{
-        return current_device == DINGOO_A320;
-}
-
 /* init the fd global variable and set the initial config for seek */
 void init_controls(void)
 {
@@ -80,8 +44,6 @@ void init_controls(void)
 	seek.tuner = 0;
 	seek.type = V4L2_TUNER_RADIO;
 	seek.wrap_around = 1;
-
-	set_current_device(); /* discover if we're in a GCW or DINGOO_A320 */
 }
 
 /* frequency in MHz */
@@ -168,11 +130,11 @@ void mixer_control(int mode, long *volume, long *min, long *max)
 	int localMode = 0;
 
 	if (mode == VOLUME_GET)
-		localMode = (is_gcw()) ? PLAYBACK_VOLUME_GET : CAPTURE_VOLUME_GET;
+		localMode = PLAYBACK_VOLUME_GET;
 	else if (mode == VOLUME_SET)
-		localMode = (is_gcw()) ? PLAYBACK_VOLUME_SET : CAPTURE_VOLUME_SET;
+		localMode = PLAYBACK_VOLUME_SET;
 	else if (mode == BYPASS_TURN_OFF)
-		localMode = (is_gcw()) ? HEADPHONE_TURN_OFF : BYPASS_PLAYBACK_OFF;
+		localMode = HEADPHONE_TURN_OFF;
 		/* In GCW this could be SPEAKER_TURN_OFF too*/
 	else if (mode == BYPASS_VERIFICATION)
 		localMode = BYPASS_VERIFICATION;
@@ -193,11 +155,7 @@ void mixer_control(int mode, long *volume, long *min, long *max)
 	else if (mode == TURN_OFF)
 		localMode = CAPTURE_TURN_OFF;
 
-	if (is_gcw())
-		mixer_control_gcw(localMode, volume, min, max);
-
-	else if (is_dingooa320())
-		mixer_control(localMode, volume, min, max);
+	mixer_control_gcw(localMode, volume, min, max);
 }
 
 /* Controls the alsamixer atributes of GCW device */
@@ -295,73 +253,4 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 			snd_mixer_selem_set_enum_item(elem, channel, 3);
 		}
 	}
-}
-
-/* Controls the alsamixer atributes */
-void mixer_control_a320(int mode, long *volume, long *min, long *max)
-{
-	snd_mixer_t *handle;
-	snd_mixer_selem_id_t *sid;
-	snd_mixer_elem_t *elem;
-
-	snd_mixer_selem_channel_id_t channel = SND_MIXER_SCHN_SIDE_LEFT;
-
-	snd_mixer_open(&handle, 0);
-	snd_mixer_attach(handle, "default");
-	snd_mixer_selem_register(handle, NULL, NULL);
-	snd_mixer_load(handle);
-
-	snd_mixer_selem_id_alloca(&sid);
-	snd_mixer_selem_id_set_index(sid, 0);
-
-	/* Controls volume */
-	if (mode == CAPTURE_VOLUME_SET || mode == CAPTURE_VOLUME_GET) {
-		snd_mixer_selem_id_set_name(sid, "Master");
-
-		elem = snd_mixer_find_selem(handle, sid);
-	
-		if (mode == CAPTURE_VOLUME_GET) {
-			snd_mixer_selem_get_capture_volume(elem, channel, volume);
-			snd_mixer_selem_get_capture_volume_range(elem, min, max);
-
-		} else if (mode == CAPTURE_VOLUME_SET){
-			printf("Volume set to %ld\n", *volume);
-			snd_mixer_selem_set_capture_volume_all(elem, *volume);
-		}
-
-	/* Turn on the Line control */
-	} else if (mode == CAPTURE_TURN_ON || mode == CAPTURE_TURN_OFF) {
-		snd_mixer_selem_id_set_name(sid, "Line");
-
-		elem = snd_mixer_find_selem(handle, sid);
-
-		if (mode == CAPTURE_TURN_ON) {
-			snd_mixer_selem_set_capture_switch_all(elem, 1);
-		} else if (mode == CAPTURE_TURN_OFF) {
-			snd_mixer_selem_set_capture_switch_all(elem, 0);
-		}
-
-	/* Active bypass for play the radio directly from input */
-	} else if (mode == BYPASS_PLAYBACK_ON || mode == BYPASS_PLAYBACK_OFF) {
-		snd_mixer_selem_id_set_name(sid, "Output Mixer Bypass");
-
-		elem = snd_mixer_find_selem(handle, sid);
-
-		if (mode == BYPASS_PLAYBACK_ON) {
-			snd_mixer_selem_set_playback_switch_all(elem, 1);
-		} else if (mode == BYPASS_PLAYBACK_OFF) {
-			snd_mixer_selem_set_playback_switch_all(elem, 0);
-
-		}
-
-	/* Verify if the bypass is turned on */
-	} else if (mode == BYPASS_VERIFICATION) {
-		snd_mixer_selem_id_set_name(sid, "Output Mixer Bypass");
-
-		elem = snd_mixer_find_selem(handle, sid);
-		/* use volume parameter to return the value */
-		snd_mixer_selem_get_playback_switch(elem, channel, (int *)volume);
-	}
-
-	snd_mixer_close(handle);
 }
