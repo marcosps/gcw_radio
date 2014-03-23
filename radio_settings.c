@@ -133,13 +133,6 @@ void mixer_control(int mode, long *volume, long *min, long *max)
 		localMode = PLAYBACK_VOLUME_GET;
 	else if (mode == VOLUME_SET)
 		localMode = PLAYBACK_VOLUME_SET;
-	else if (mode == BYPASS_TURN_OFF)
-		localMode = HEADPHONE_TURN_OFF;
-		/* In GCW this could be SPEAKER_TURN_OFF too*/
-	else if (mode == BYPASS_VERIFICATION)
-		localMode = BYPASS_VERIFICATION;
-
-	/* GCW only */
 	else if (mode == HEADPHONE_TURN_ON)
 		localMode = HEADPHONE_TURN_ON;
 	else if (mode == HEADPHONE_TURN_OFF)
@@ -148,12 +141,6 @@ void mixer_control(int mode, long *volume, long *min, long *max)
 		localMode = SPEAKER_TURN_ON;
 	else if (mode == SPEAKER_TURN_OFF)
 		localMode = SPEAKER_TURN_OFF;
-
-	/* Dingoo A320 only */
-	else if (mode == TURN_ON)
-		localMode = CAPTURE_TURN_ON;
-	else if (mode == TURN_OFF)
-		localMode = CAPTURE_TURN_OFF;
 
 	mixer_control_gcw(localMode, volume, min, max);
 }
@@ -189,11 +176,6 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 		int err = snd_mixer_selem_set_capture_switch_all(elem, 1);
 		if (err < 0)
 			printf("Error set line in: %s\n", snd_strerror(err));
-
-	} else if (mode == BYPASS_VERIFICATION) {
-		int ret;
-		snd_mixer_selem_get_capture_switch(elem, channel, &ret);
-		printf("Line In Get: %d\n", ret);
 	}
 
 	if (mode == PLAYBACK_VOLUME_GET || mode == PLAYBACK_VOLUME_SET) {
@@ -224,10 +206,10 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 
 		if (mode == HEADPHONE_TURN_ON) {
 			printf("Headphone Source: Line In\n");
-			snd_mixer_selem_set_enum_item(elem, channel, 2);
+			snd_mixer_selem_set_enum_item(elem, channel, 1);
 		} else if (mode == HEADPHONE_TURN_OFF) {
 			printf("Headphone Source: PCM\n");
-			snd_mixer_selem_set_enum_item(elem, channel, 3);
+			snd_mixer_selem_set_enum_item(elem, channel, 0);
 		}
 
 	} else if (mode == SPEAKER_TURN_ON || mode == SPEAKER_TURN_OFF) {

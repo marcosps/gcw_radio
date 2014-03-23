@@ -40,7 +40,6 @@ enum mixer_modes {
 	CAPTURE_VOLUME_SET,  /* Set the volume with a new value */
 	CAPTURE_TURN_ON,     /* Turn on the radio capture mode */
 	CAPTURE_TURN_OFF,    /* Turn off the radio capture mode */
-	BYPASS_PLAYBACK_ON,  /* Play the radio without capture/playback*/
 	BYPASS_PLAYBACK_OFF, /* Stop the bypass */
 	BYPASS_VERIFICATION,  /* Verificate if the bypass is turned on */
 

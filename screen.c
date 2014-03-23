@@ -130,9 +130,8 @@ static void finish_app()
 {
 	if (end_application) {
 		set_down();
-		mixer_control(BYPASS_TURN_OFF, NULL, NULL, NULL);
 
-		/* Turn off the cature mode */
+		/* Turn off all modes */
 		mixer_control(HEADPHONE_TURN_OFF, NULL, NULL, NULL);
 		mixer_control(SPEAKER_TURN_OFF, NULL, NULL, NULL);
 	}
@@ -210,7 +209,7 @@ int main(int argc, char* argv[])
 	SDL_Event event;
   
 	int keypress = 0, lock = 0;
-	long vol, min, max, ret;
+	long vol, min, max, ret = 0;
 	float freq = 0;
 
 	char *button_pressed;
@@ -282,16 +281,13 @@ int main(int argc, char* argv[])
 		/* Initialize the radio by the driver */
 		setup(freq);
 
-		int mode = TURN_ON;
+		int mode = HEADPHONE_TURN_ON;
 
 		/* we can get HEADPHONE or SPEAKER from handle */
 		handle_mode(MODE_GET, &mode);
 
 		/* Set the flag to turn on the capture line */
 		mixer_control(mode, &vol, &min, &max);
-
-		/* Turn on the bypass */
-		mixer_control(BYPASS_PLAYBACK_ON, &vol, &min, &max);
 
 		/* if we don't have the last_volume file, use the default */
 		handle_sound_level(FILE_VOLUME_READ, &vol);
