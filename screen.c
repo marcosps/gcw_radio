@@ -379,7 +379,7 @@ int main(int argc, char* argv[])
 							, &vol
 							, &min
 							, &max);
-					int mode = HEADPHONE;
+					int mode = HEADPHONE_TURN_ON;
 					handle_mode(MODE_SET, &mode);
 
 				/* A Button - Turn on Speaker */
@@ -394,7 +394,7 @@ int main(int argc, char* argv[])
 							, &min
 							, &max);
 
-					int mode = SPEAKER;
+					int mode = SPEAKER_TURN_ON;
 					handle_mode(MODE_SET, &mode);
 
 				/* the B button

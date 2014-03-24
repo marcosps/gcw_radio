@@ -127,20 +127,27 @@ void set_down(void)
 
 void mixer_control(int mode, long *volume, long *min, long *max)
 {
-	int localMode = 0;
+	int localMode = mode;
 
-	if (mode == VOLUME_GET)
+	if (mode == VOLUME_GET)	{
 		localMode = PLAYBACK_VOLUME_GET;
-	else if (mode == VOLUME_SET)
+		printf("VOLUME_GET\nPLAYBACK_VOLUME_SET");
+	} else if (mode == VOLUME_SET) {
 		localMode = PLAYBACK_VOLUME_SET;
-	else if (mode == HEADPHONE_TURN_ON)
+		printf("VOLUME_SET\nPLAYBACK_VOLUME_SET\n");
+	} else if (mode == HEADPHONE_TURN_ON) {
 		localMode = HEADPHONE_TURN_ON;
-	else if (mode == HEADPHONE_TURN_OFF)
+		printf("HEADPHONE_TURN_ON\n");
+	} else if (mode == HEADPHONE_TURN_OFF) {
 		localMode = HEADPHONE_TURN_OFF;
-	else if (mode == SPEAKER_TURN_ON)
+		printf("HEADPHONE_TURN_OFF\n");
+	} else if (mode == SPEAKER_TURN_ON) {
 		localMode = SPEAKER_TURN_ON;
-	else if (mode == SPEAKER_TURN_OFF)
+		printf("SPEAKER_TURN_ON\n");
+	} else if (mode == SPEAKER_TURN_OFF) {
 		localMode = SPEAKER_TURN_OFF;
+		printf("SPEAKER_TURN_OFF\n");
+	}
 
 	mixer_control_gcw(localMode, volume, min, max);
 }

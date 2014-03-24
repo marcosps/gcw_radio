@@ -20,7 +20,6 @@ void set_down(void);
 void mixer_control(int mode, long *volume, long *min, long *max);
 
 void mixer_control_gcw(int mode, long *volume, long *min, long *max);
-void mixer_control_a320(int mode, long *volume, long *min, long *max);
 
 float seek_radio_station(int mode);
 
@@ -62,14 +61,4 @@ enum modes {
 	HEIGHT_CENTER,
 	SEEK_UP,
 	SEEK_DOWN,
-
-	/* GCW only */
-	HEADPHONE,
-	SPEAKER
-};
-
-/* suported devices */
-enum device {
-	DINGOO_A320,
-	GCW
 };
