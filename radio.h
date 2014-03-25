@@ -32,19 +32,10 @@ enum mixer_modes {
         VOLUME_SET,          /* Set actual volume */
 	TURN_ON,             /* Turn on the Line In */
 	TURN_OFF,            /* Turn off the Line In */
-	BYPASS_TURN_OFF,     /* Turn off the bypass */
 
-	/* Used by Dingoo A320 */
-	CAPTURE_VOLUME_GET,  /* Get the actual volume */
-	CAPTURE_VOLUME_SET,  /* Set the volume with a new value */
-	CAPTURE_TURN_ON,     /* Turn on the radio capture mode */
-	CAPTURE_TURN_OFF,    /* Turn off the radio capture mode */
-	BYPASS_PLAYBACK_OFF, /* Stop the bypass */
 	BYPASS_VERIFICATION,  /* Verificate if the bypass is turned on */
 
 	/* GCW ONLY */
-	PLAYBACK_VOLUME_GET,  /* Get actual volume */
-	PLAYBACK_VOLUME_SET,  /* Set actual volume */
 	HEADPHONE_TURN_ON,    /* Turn on the LineIn to play radio */
 	HEADPHONE_TURN_OFF,   /* Turn off the LineIn to play radio */
 	SPEAKER_TURN_ON,      /* Turn on speakers */

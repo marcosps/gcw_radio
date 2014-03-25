@@ -129,13 +129,7 @@ void mixer_control(int mode, long *volume, long *min, long *max)
 {
 	int localMode = mode;
 
-	if (mode == VOLUME_GET)	{
-		localMode = PLAYBACK_VOLUME_GET;
-		printf("VOLUME_GET\nPLAYBACK_VOLUME_SET");
-	} else if (mode == VOLUME_SET) {
-		localMode = PLAYBACK_VOLUME_SET;
-		printf("VOLUME_SET\nPLAYBACK_VOLUME_SET\n");
-	} else if (mode == HEADPHONE_TURN_ON) {
+	if (mode == HEADPHONE_TURN_ON) {
 		localMode = HEADPHONE_TURN_ON;
 		printf("HEADPHONE_TURN_ON\n");
 	} else if (mode == HEADPHONE_TURN_OFF) {
@@ -185,15 +179,15 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 			printf("Error set line in: %s\n", snd_strerror(err));
 	}
 
-	if (mode == PLAYBACK_VOLUME_GET || mode == PLAYBACK_VOLUME_SET) {
+	if (mode == VOLUME_GET || mode == VOLUME_SET) {
 		snd_mixer_selem_id_set_name(sid, "Headphone");
 		elem = snd_mixer_find_selem(handle, sid);
 	
-		if (mode == PLAYBACK_VOLUME_GET) {
+		if (mode == VOLUME_GET) {
 			snd_mixer_selem_get_playback_volume(elem, channel, volume);
 			snd_mixer_selem_get_playback_volume_range(elem, min, max);
 
-		} else if (mode == PLAYBACK_VOLUME_SET) {
+		} else if (mode == VOLUME_SET) {
 			printf("GCW: Volume set to %ld\n", *volume);
 			snd_mixer_selem_set_playback_volume_all(elem, *volume);
 		}
@@ -202,7 +196,7 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 		snd_mixer_selem_id_set_name(sid, "Line In Bypass");
 		elem = snd_mixer_find_selem(handle, sid);
 
-		if (mode == PLAYBACK_VOLUME_SET) {
+		if (mode == VOLUME_SET) {
 			printf("Line in Bypass: Volume set to %ld\n", *volume);
 			snd_mixer_selem_set_playback_volume_all(elem, *volume);
 		}
