@@ -170,7 +170,7 @@ void load_ttf_font()
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 210, shortcut_info, screen);
 
-		message = "B: Run in background";
+		message = "B: Run in background | Y: Turn on Headphone | A: Turn on Speakers";
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 220, shortcut_info, screen);
 	}
