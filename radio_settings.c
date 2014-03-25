@@ -230,10 +230,10 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 
 		if (mode == SPEAKER_TURN_ON) {
 			printf("Line Out Source turned on\n");
-			snd_mixer_selem_set_enum_item(elem, channel, 2);
+			snd_mixer_selem_set_enum_item(elem, channel, 1);
 		} else if (mode == SPEAKER_TURN_OFF) {
 			printf("Line Out Source turned off\n");
-			snd_mixer_selem_set_enum_item(elem, channel, 3);
+			snd_mixer_selem_set_enum_item(elem, channel, 0);
 		}
 	}
 }
