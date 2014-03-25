@@ -1,0 +1,8 @@
+[Desktop Entry]
+
+Type=Application
+Name=Radio
+Comment=A nice radio player for GCW
+Exec=radio
+Icon=radio
+Categories=applications;

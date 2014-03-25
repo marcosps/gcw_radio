@@ -26,16 +26,16 @@ VERSION=v0.2.1
 
 all: build bin
 
-build: radio.dge
+build: radio
 
-radio.dge: $(FILES)
+radio: $(FILES)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
-	rm -rf radio.dge radio_player radio_player_$(VERSION).tar.gz
+	rm -rf radio radio_player radio_player.opk
 
 bin: build
 	mkdir radio_player
-	cp radio.dge radio.png Fiery_Turk.ttf README radio_player
-	tar -zcf radio_player_$(VERSION).tar.gz radio_player/
+	cp radio radio.png Fiery_Turk.ttf README default.gcw0.desktop radio_player
+	mksquashfs radio_player radio_player.opk -all-root -noappend -no-exports -no-xattrs
 	rm -rf radio_player
