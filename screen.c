@@ -311,7 +311,7 @@ int main(int argc, char* argv[])
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
 	while(!keypress) {
-		while(SDL_PollEvent(&event)) {
+		while(SDL_WaitEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT:
 			case SDL_KEYDOWN:
@@ -354,14 +354,14 @@ int main(int argc, char* argv[])
 						handle_sound_level(FILE_VOLUME_WRITE, &vol);
 					}
 
-				/* the R button */
+				/* the R button -> Seek Next */
 				} else if (!strcmp(button_pressed, "backspace")) {
 					freq = seek_radio_station(SEEK_UP);
 
 					print_freq(freq);
 					handle_user_freq(FILE_FREQ_WRITE, &freq);
 				
-				/* the L button*/
+				/* the L button -> Seek Previous */
 				} else if (!strcmp(button_pressed, "tab")) {
 					freq = seek_radio_station(SEEK_DOWN);
 
@@ -416,6 +416,9 @@ int main(int argc, char* argv[])
 					SDL_GetKeyName(event.key.keysym.sym));
 				}
 			}
+			// break the WaitEvent loop
+			if (keypress)
+				break;
 		}
 	}
 
