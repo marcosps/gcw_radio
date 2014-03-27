@@ -169,13 +169,9 @@ void load_ttf_font()
 }
 
 /* Show to user what is the current frequency */
-void print_freq(float freq)
+void print_freq(float freq, int searching)
 {
-	char freq_char[6];
-
 	if (freq_font) {
-
-		sprintf(freq_char, "%.1f", freq);
 
 		/* Remove the old frequency from the screen */
 		SDL_Rect tmp_rect;
@@ -189,10 +185,19 @@ void print_freq(float freq)
 	
 		SDL_FillRect(screen, &tmp_rect, color);
 
+		int line = 138;
+		char freq_char[13];
+
+		sprintf(freq_char, "%.1f", freq);
+
+		if (searching) {
+			line = 80;
+			strcpy(freq_char, "Searching...");
+		}
+
 		freq_info = TTF_RenderText_Solid(freq_font, freq_char, scolor);
 	
-		apply_surface(138 /* the center for 6 chars */
-   			    , get_center(HEIGHT_CENTER, freq_char, 28), freq_info, screen);
+		apply_surface(line, get_center(HEIGHT_CENTER, freq_char, 28), freq_info, screen);
 	}
 }
 
@@ -295,7 +300,7 @@ int main(int argc, char* argv[])
 
 	/* Manage the ttf font */
 	load_ttf_font();
-	print_freq(freq);
+	print_freq(freq, 0);
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
@@ -339,16 +344,16 @@ int main(int argc, char* argv[])
 
 				/* the R button -> Seek Next */
 				} else if (!strcmp(button_pressed, "backspace")) {
+					print_freq(freq, 1);
 					freq = seek_radio_station(SEEK_UP);
-
-					print_freq(freq);
+					print_freq(freq, 0);
 					handle_user_freq(FILE_FREQ_WRITE, &freq);
 				
 				/* the L button -> Seek Previous */
 				} else if (!strcmp(button_pressed, "tab")) {
+					print_freq(freq, 1);
 					freq = seek_radio_station(SEEK_DOWN);
-
-					print_freq(freq);
+					print_freq(freq, 0);
 					handle_user_freq(FILE_FREQ_WRITE, &freq);
 
 				/* Y Button -> Turn on Headphone */
@@ -356,14 +361,16 @@ int main(int argc, char* argv[])
 					mixer_control(SPEAKER_TURN_OFF, &vol, &min, &max);
 					mixer_control(HEADPHONE_TURN_ON, &vol, &min, &max);
 
-					handle_mode(MODE_SET, HEADPHONE_TURN_ON);
+					int mode = HEADPHONE_TURN_ON;
+					handle_mode(MODE_SET, &mode);
 
 				/* A Button - Turn on Speaker */
 				} else if (!strcmp(button_pressed, "left ctrl")) {
 					mixer_control(HEADPHONE_TURN_OFF, &vol, &min, &max);
 					mixer_control(SPEAKER_TURN_ON, &vol, &min, &max);
 
-					handle_mode(MODE_SET, SPEAKER_TURN_ON);
+					int mode = SPEAKER_TURN_ON;
+					handle_mode(MODE_SET, &mode);
 
 				/* the B button
 				 * Just close the application, and let the radio plays
