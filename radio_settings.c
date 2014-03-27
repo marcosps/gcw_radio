@@ -18,7 +18,6 @@
 #include<sys/ioctl.h>
 #include<linux/videodev2.h>
 #include<alsa/asoundlib.h>
-#include<pthread.h>
 
 #include "radio.h"
 
@@ -125,29 +124,8 @@ void set_down(void)
 	fprintf(stdout, "Exiting..bye!\n");
 }
 
-void mixer_control(int mode, long *volume, long *min, long *max)
-{
-	int localMode = mode;
-
-	if (mode == HEADPHONE_TURN_ON) {
-		localMode = HEADPHONE_TURN_ON;
-		printf("HEADPHONE_TURN_ON\n");
-	} else if (mode == HEADPHONE_TURN_OFF) {
-		localMode = HEADPHONE_TURN_OFF;
-		printf("HEADPHONE_TURN_OFF\n");
-	} else if (mode == SPEAKER_TURN_ON) {
-		localMode = SPEAKER_TURN_ON;
-		printf("SPEAKER_TURN_ON\n");
-	} else if (mode == SPEAKER_TURN_OFF) {
-		localMode = SPEAKER_TURN_OFF;
-		printf("SPEAKER_TURN_OFF\n");
-	}
-
-	mixer_control_gcw(localMode, volume, min, max);
-}
-
 /* Controls the alsamixer atributes of GCW device */
-void mixer_control_gcw(int mode, long *volume, long *min, long *max)
+void mixer_control(int mode, long *volume, long *min, long *max)
 {
 	snd_mixer_t *handle;
 	snd_mixer_selem_id_t *sid;
@@ -186,7 +164,6 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 		if (mode == VOLUME_GET) {
 			snd_mixer_selem_get_playback_volume(elem, channel, volume);
 			snd_mixer_selem_get_playback_volume_range(elem, min, max);
-
 		} else if (mode == VOLUME_SET) {
 			printf("GCW: Volume set to %ld\n", *volume);
 			snd_mixer_selem_set_playback_volume_all(elem, *volume);
@@ -235,5 +212,29 @@ void mixer_control_gcw(int mode, long *volume, long *min, long *max)
 			printf("Line Out Source turned off\n");
 			snd_mixer_selem_set_enum_item(elem, channel, 0);
 		}
+	} else if (mode == BYPASS_VERIFICATION) {
+		// volume here means that the radio is running in background or not
+		*volume = 0;
+
+		unsigned int setting = 0;
+		snd_mixer_selem_id_set_name(sid, "Headphone Source");
+		elem = snd_mixer_find_selem(handle, sid);
+
+		snd_mixer_selem_get_enum_item(elem, channel, &setting);
+
+		// the headphone is turned on
+		if (setting == 1) {
+			*volume = 1;
+			return;
+		}
+
+		snd_mixer_selem_id_set_name(sid, "Line Out Source");
+		elem = snd_mixer_find_selem(handle, sid);
+
+		snd_mixer_selem_get_enum_item(elem, channel, &setting);
+
+		// if both headphone and speakers are off, return 0 in volume to tell the screen that we need 
+		// to setup the radio
+		*volume = setting == 1;
 	}
 }

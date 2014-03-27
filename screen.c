@@ -31,11 +31,9 @@
 
 #define VOLUME_BAR_DISTANCE 7
 
-#define VOLUME_BAR_X_POS \
-	WIDTH - VOLUME_RECT_WIDTH
+#define VOLUME_BAR_X_POS (WIDTH - VOLUME_RECT_WIDTH)
 
-#define HALF(string, wh, size) \
-	((size - (strlen(string) * wh)) / 2)
+#define HALF(string, wh, size) ((size - (strlen(string) * wh)) / 2)
 
 /* All rectangles of volume control */
 SDL_Rect rects[32];
@@ -268,11 +266,11 @@ int main(int argc, char* argv[])
 
 	init_controls();
 
-	/* verify if the radio is running in background */
-	mixer_control(BYPASS_VERIFICATION, &ret, NULL, NULL);
-
 	/* get the actual volume, the min and max volume range */
 	mixer_control(VOLUME_GET, &vol, &min, &max);
+
+	/* verify if the radio is running in background */
+	mixer_control(BYPASS_VERIFICATION, &ret, NULL, NULL);
 
 	/* if the radio is running in background, don't set the 
 	 * same things again

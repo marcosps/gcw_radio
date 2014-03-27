@@ -16,10 +16,7 @@
 void setup(float frequency);
 void set_down(void);
 
-/* wrapper function to call GCW settings or Dingoo A320 settings */
 void mixer_control(int mode, long *volume, long *min, long *max);
-
-void mixer_control_gcw(int mode, long *volume, long *min, long *max);
 
 float seek_radio_station(int mode);
 
