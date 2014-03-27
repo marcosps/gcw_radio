@@ -97,10 +97,7 @@ void draw_volume_bar(SDL_Surface *screen, int vol, int mode)
 {
 	int i = 0;
 
-	Uint32 color = SDL_MapRGB(screen->format
-				, colors[vol][0]
-				, colors[vol][1]
-				, colors[vol][2]);
+	Uint32 color = SDL_MapRGB(screen->format, colors[vol][0], colors[vol][1], colors[vol][2]);
 
 	switch (mode) {
 	case STARTUP:
@@ -110,10 +107,7 @@ void draw_volume_bar(SDL_Surface *screen, int vol, int mode)
 		}
 		break;
 	case VOLUME_DOWN:
-		color = SDL_MapRGB(screen->format
-				, 0
-				, 0
-				, 0);
+		color = SDL_MapRGB(screen->format, 0, 0, 0);
 		SDL_FillRect(screen, &rects[vol], color);
 		break;
 	case VOLUME_UP:
@@ -291,10 +285,7 @@ int main(int argc, char* argv[])
 		handle_sound_level(FILE_VOLUME_READ, &vol);
 
 		/* set the sound volume */
-		mixer_control(VOLUME_SET
-				, &vol
-				, &min
-				, &max);
+		mixer_control(VOLUME_SET, &vol, &min, &max);
 	}
 
 	setup_volume_bar();
@@ -334,10 +325,7 @@ int main(int argc, char* argv[])
 					if (vol) {
 						draw_volume_bar(screen, vol == 1 ? 1 : vol, VOLUME_DOWN);
 						vol--;
-						mixer_control(VOLUME_SET
-								, &vol
-								, &min
-								, &max);
+						mixer_control(VOLUME_SET, &vol, &min, &max);
 						handle_sound_level(FILE_VOLUME_WRITE, &vol);
 					}
 
@@ -345,10 +333,7 @@ int main(int argc, char* argv[])
 					if (vol + 1 <= max) {
 						draw_volume_bar(screen, vol == 0 ? 1 : vol + 1, VOLUME_UP);
 						vol++;
-						mixer_control(VOLUME_SET
-								, &vol
-								, &min
-								, &max);
+						mixer_control(VOLUME_SET, &vol, &min, &max);
 						handle_sound_level(FILE_VOLUME_WRITE, &vol);
 					}
 
@@ -368,32 +353,17 @@ int main(int argc, char* argv[])
 
 				/* Y Button -> Turn on Headphone */
 				} else if (!strcmp(button_pressed, "space")) {
-					mixer_control(SPEAKER_TURN_OFF
-							, &vol
-							, &min
-							, &max);
+					mixer_control(SPEAKER_TURN_OFF, &vol, &min, &max);
+					mixer_control(HEADPHONE_TURN_ON, &vol, &min, &max);
 
-					mixer_control(HEADPHONE_TURN_ON
-							, &vol
-							, &min
-							, &max);
-					int mode = HEADPHONE_TURN_ON;
-					handle_mode(MODE_SET, &mode);
+					handle_mode(MODE_SET, HEADPHONE_TURN_ON);
 
 				/* A Button - Turn on Speaker */
 				} else if (!strcmp(button_pressed, "left ctrl")) {
-					mixer_control(HEADPHONE_TURN_OFF
-							, &vol
-							, &min
-							, &max);
+					mixer_control(HEADPHONE_TURN_OFF, &vol, &min, &max);
+					mixer_control(SPEAKER_TURN_ON, &vol, &min, &max);
 
-					mixer_control(SPEAKER_TURN_ON
-							, &vol
-							, &min
-							, &max);
-
-					int mode = SPEAKER_TURN_ON;
-					handle_mode(MODE_SET, &mode);
+					handle_mode(MODE_SET, SPEAKER_TURN_ON);
 
 				/* the B button
 				 * Just close the application, and let the radio plays

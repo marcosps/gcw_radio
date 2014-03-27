@@ -13,11 +13,11 @@
  * GNU General Public License for more details.
  */
 
-#include<fcntl.h>
-#include<unistd.h>
-#include<sys/ioctl.h>
-#include<linux/videodev2.h>
-#include<alsa/asoundlib.h>
+#include <alsa/asoundlib.h>
+#include <fcntl.h>
+#include <linux/videodev2.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #include "radio.h"
 

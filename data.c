@@ -15,12 +15,12 @@
  * GNU General Public License for more details.
  */
 
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
-#include <string.h>
 
 #include "data.h"
 
@@ -35,16 +35,13 @@ static int verify_dir(void)
 
 	if (home) {
 		sprintf(path, "%s/%s", home, ".radioplayer");
-
 		dir = opendir(path);
 
-		if (dir) {
+		/* creates the .radioplayer is it don't exist */
+		if (dir)
 			closedir(dir);
-		} else {
-			/* creates the .radioplayer is it don't exist */
+		else
 			return mkdir(path, 0777);
-		}
-
 		return 0;
 	}
 
@@ -138,10 +135,6 @@ void handle_mode(int mode, int *value)
 
 			fgets(aux_mode, 2, file);
 			sscanf(aux_mode, "%d", value);
-
-			printf("got %s\n", aux_mode);
-			printf("mode get == %d\n", *value);
-
 		} else if (mode == MODE_SET) {
 			file = fopen(aux_path, "w");
 
@@ -151,7 +144,6 @@ void handle_mode(int mode, int *value)
 			}
 
 			fprintf(file, "%i", *value);
-			printf("mode set == %d\n", *value);
 		}
 
 		if (file)

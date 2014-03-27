@@ -24,15 +24,11 @@ void init_controls(void);
 
 /* Modes to interact with the mixer interface */
 enum mixer_modes {
-        /* Used by the wrapper */
 	VOLUME_GET,          /* Get actual volume */
         VOLUME_SET,          /* Set actual volume */
-	TURN_ON,             /* Turn on the Line In */
-	TURN_OFF,            /* Turn off the Line In */
 
 	BYPASS_VERIFICATION,  /* Verificate if the bypass is turned on */
 
-	/* GCW ONLY */
 	HEADPHONE_TURN_ON,    /* Turn on the LineIn to play radio */
 	HEADPHONE_TURN_OFF,   /* Turn off the LineIn to play radio */
 	SPEAKER_TURN_ON,      /* Turn on speakers */
