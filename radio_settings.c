@@ -141,22 +141,6 @@ void mixer_control(int mode, long *volume, long *min, long *max)
 	snd_mixer_selem_id_alloca(&sid);
 	snd_mixer_selem_id_set_index(sid, 0);
 
-	snd_mixer_selem_id_set_name(sid, "Line In");
-	elem = snd_mixer_find_selem(handle, sid);
-
-	if (mode == HEADPHONE_TURN_ON || mode == SPEAKER_TURN_ON) {
-		printf("Line In: Turned on\n");
-		int err = snd_mixer_selem_set_capture_switch_all(elem, 2);
-		if (err < 0)
-			printf("Error set line in: %s\n", snd_strerror(err));
-
-	} else if (mode == HEADPHONE_TURN_OFF || mode == SPEAKER_TURN_OFF) {
-		printf("Line In: Turned off\n");
-		int err = snd_mixer_selem_set_capture_switch_all(elem, 1);
-		if (err < 0)
-			printf("Error set line in: %s\n", snd_strerror(err));
-	}
-
 	if (mode == VOLUME_GET || mode == VOLUME_SET) {
 		snd_mixer_selem_id_set_name(sid, "Headphone");
 		elem = snd_mixer_find_selem(handle, sid);
