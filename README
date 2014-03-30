@@ -1,41 +1,6 @@
-OpenDingux Radio Player
+Radio Player for GCW
 -----------------------
-	This application is a radio player for OpenDingux.
-
-------
-STATUS
-------
-	This application is under development. Updates will come
-	very quick.
-
---------
-DOWNLOAD
---------
-	You can download the executable from:
-	https://github.com/downloads/marcosps/radio_player/radio_player_v0.1.tar
-
-	You can also clone the repository by:
-	git clone https://github.com/marcosps/radio_player.git
-
------------
-COMPILATION
------------
-	After clone the repo(or download the source code) you can compile the radio player
-	code. To do that, you will need the OpenDingux toolchain[1], and will need to setup you
-	environment[2].
-
-	Aftet this, you can enter in the dir, and do a simply 'make'. It will compile the source code.
-
-------------
-INSTALLATION
-------------
-	If you download the executable, you can extract the .tar file and put this in your SD card.
-	
-	If you compile the code, a tar file will be created with the name radio_player_v0.1.tar.
-	You can extract this tar file and put the content in your SD card.
-
-	After put the executables in the SD card you just need to make a link in the menu of OpenDingux
-	pointing to the radio.dge file(in the same dir that you put before).
+	This application is a radio player for OpenDingux in GCW device.
 
 -----
 USING
@@ -49,6 +14,8 @@ USING
 	R     -> Seek next radio station from the current frequency
 	L     -> Seek previous radio station from the current frequency
 	B     -> Run in background. You can do anything, and still listen the radio!
+	Y     -> Turn on Headphone to listen the radio and turn off speakers
+	A     -> Turn on Speakers to listen radio and turn off headphones
 
   There is a shortcut bar in the bottom of the screen, that shows this controls.
 ---------------------------------------------------------
@@ -57,8 +24,6 @@ Suggestions, questions and criticisms, please contact me:
 	marcos.souza.org@gmail.com
 
 If you want to help, and have some ideas or doubts, please clone:
-	git://github.com/marcosps/radio_player.git
+	git://github.com/marcosps/gcw_radio.git
 
 and after help us to make it better :)
-
-Marcos Paulo de Souza - 10/09/2012
