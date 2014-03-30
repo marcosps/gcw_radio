@@ -23,9 +23,16 @@
 #include <sys/stat.h>
 
 #include "data.h"
+#include "radio.h"
 
 /* Path to the radio player dir */
 static char path[255];
+
+/* Auxiliary path to get the other dirs */
+static char aux_path[255];
+
+/* Auxiliary FILE pointer */
+FILE *file = NULL;
 
 /* verify if the home/.radioplayer dir exists */
 static int verify_dir(void)
@@ -51,9 +58,7 @@ static int verify_dir(void)
 /* get the last frequency that the user was listening before turn off */
 void handle_user_freq(int mode, float *freq)
 {
-	char aux_path[255];
 	char line[7];
-	FILE *file = NULL;
 
 	if (path[0] != '0') {
 
@@ -89,8 +94,7 @@ void handle_user_freq(int mode, float *freq)
 /* save/restore sound level */
 void handle_sound_level(int mode, long *volume)
 {
-	char aux_path[255], line[3];
-	FILE *file = NULL;
+	char line[3];
 
 	if (path[0] != '0') {
 		sprintf(aux_path, "%s/%s", path, "last_volume");
@@ -122,8 +126,7 @@ void handle_sound_level(int mode, long *volume)
 
 void handle_mode(int mode, int *value)
 {
-	char aux_path[255], aux_mode[2];
-	FILE *file = NULL;
+	char  aux_mode[2];
 
 	if (path[0] != '0') {
 		sprintf(aux_path, "%s/%s", path, "last_mode");
@@ -148,6 +151,76 @@ void handle_mode(int mode, int *value)
 
 		if (file)
 			fclose(file);
+	}
+}
+
+static void remove_new_line(char *orig)
+{
+	int i;
+	for (i = 0; i < strlen(orig); i++)
+		if (orig[i] == '\n')
+			orig[i] = '\0';
+}
+
+static void write_favradios()
+{
+	sprintf(aux_path, "%s/%s", path, "favorite_radios");
+	file = fopen(aux_path, "w");
+
+	if (file) {
+		int i;
+		for (i = 0; i < favrads.num_radios; i++)
+			fprintf(file, "%s\n", favrads.radio[i]);
+	}
+}
+
+static void sort_radio_stations()
+{
+	int i, j, k = favrads.num_radios - 1;
+
+	for (i = 0; i < favrads.num_radios; i++) {
+		for (j = 0; j < k; j++) {
+			if (atof(favrads.radio[j]) > atof(favrads.radio[j + 1])) {
+				char *aux = favrads.radio[j];
+				strcpy(favrads.radio[j], favrads.radio[j + 1]);
+				strcpy(favrads.radio[j + 1], aux);
+			}
+		}
+		k--;
+	}
+}
+
+void handle_fav_radios(int mode, char *value)
+{
+	if (path[0] != '0') {
+		sprintf(aux_path, "%s/%s", path, "favorite_radios");
+		if (mode == FILE_FAVRAD_READ) {
+			file = fopen(aux_path, "r");
+
+			if (!file)
+				return;
+
+			static char *line = NULL;
+			size_t len;
+			ssize_t read;
+
+			favrads.num_radios = 0;
+
+			while ((read = getline(&line, &len, file)) != -1 && favrads.num_radios < 5) {
+				remove_new_line(line);
+				printf("Radio %s\n", line);
+				strncpy(favrads.radio[favrads.num_radios], line, strlen(line) + 1);
+				favrads.num_radios++;
+			}
+		} else if (mode == FILE_FAVRAD_WRITE) {
+			if (favrads.num_radios < 5) {
+				strcpy(favrads.radio[favrads.num_radios], value);
+				favrads.num_radios++;
+				sort_radio_stations();
+				write_favradios();
+			}
+		} else if (mode == FILE_FAVRAD_DELETE) {
+		}
 	}
 }
 

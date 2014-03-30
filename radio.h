@@ -46,3 +46,10 @@ enum modes {
 	SEEK_UP,
 	SEEK_DOWN,
 };
+
+struct radios {
+	char radio[5][6];
+	int num_radios;
+};
+
+struct radios favrads;

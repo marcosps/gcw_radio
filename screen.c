@@ -304,6 +304,8 @@ int main(int argc, char* argv[])
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
+	handle_fav_radios(FILE_FAVRAD_READ, NULL);
+
 	while(!keypress) {
 		while(SDL_WaitEvent(&event)) {
 			switch (event.type) {

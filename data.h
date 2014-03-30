@@ -14,8 +14,9 @@ enum file_modes {
 	FILE_FREQ_WRITE,
 	FILE_VOLUME_READ,
 	FILE_VOLUME_WRITE,
-
-	/* GCW only */
+	FILE_FAVRAD_READ,
+	FILE_FAVRAD_WRITE,
+	FILE_FAVRAD_DELETE,
 	MODE_GET,
 	MODE_SET
 };
@@ -26,7 +27,11 @@ void handle_user_freq(int mode, float *freq);
 /* save and retrieve last volume level from last_volume file */
 void handle_sound_level(int mode, long *volume);
 
-/* GCW only: save the last mode, if it was in speakers or headphone */
+/* save the last mode, if it was in speakers or headphone */
 void handle_mode(int mode, int *value);
+
+/* handle favorite radios, ir we want to add or maybe remove radio stations */
+void handle_fav_radios(int mode, char *value);
+
 
 int set_home_path();
