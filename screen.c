@@ -162,7 +162,7 @@ void load_ttf_font()
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 210, shortcut_info, screen);
 
-		message = "B: Run in background | Y: Turn on Headphone | A: Turn on Speakers";
+		message = "B: Run in background | Y: Switch between Headphone or Speakers";
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 220, shortcut_info, screen);
 	}
@@ -271,17 +271,16 @@ int main(int argc, char* argv[])
 	/* verify if the radio is running in background */
 	mixer_control(BYPASS_VERIFICATION, &ret, NULL, NULL);
 
+	int mode = HEADPHONE_TURN_ON;
+	/* we can get HEADPHONE or SPEAKER from handle */
+	handle_mode(MODE_GET, &mode);
+
 	/* if the radio is running in background, don't set the 
 	 * same things again
          */
 	if (!ret) {
 		/* Initialize the radio by the driver */
 		setup(freq);
-
-		int mode = HEADPHONE_TURN_ON;
-
-		/* we can get HEADPHONE or SPEAKER from handle */
-		handle_mode(MODE_GET, &mode);
 
 		/* Set the flag to turn on the capture line */
 		mixer_control(mode, &vol, &min, &max);
@@ -358,21 +357,21 @@ int main(int argc, char* argv[])
 					print_freq(freq, 0);
 					handle_user_freq(FILE_FREQ_WRITE, &freq);
 
-				/* Y Button -> Turn on Headphone */
+				/* Y Button -> Switch between Headphone and Speaker */
 				} else if (!strcmp(button_pressed, "space")) {
-					mixer_control(SPEAKER_TURN_OFF, &vol, &min, &max);
-					mixer_control(HEADPHONE_TURN_ON, &vol, &min, &max);
+					if (mode == SPEAKER_TURN_ON) {
+						mixer_control(SPEAKER_TURN_OFF, &vol, &min, &max);
+						mixer_control(HEADPHONE_TURN_ON, &vol, &min, &max);
 
-					int mode = HEADPHONE_TURN_ON;
-					handle_mode(MODE_SET, &mode);
+						mode = HEADPHONE_TURN_ON;
+						handle_mode(MODE_SET, &mode);
+					} else {
+						mixer_control(HEADPHONE_TURN_OFF, &vol, &min, &max);
+						mixer_control(SPEAKER_TURN_ON, &vol, &min, &max);
 
-				/* A Button - Turn on Speaker */
-				} else if (!strcmp(button_pressed, "left ctrl")) {
-					mixer_control(HEADPHONE_TURN_OFF, &vol, &min, &max);
-					mixer_control(SPEAKER_TURN_ON, &vol, &min, &max);
-
-					int mode = SPEAKER_TURN_ON;
-					handle_mode(MODE_SET, &mode);
+						mode = SPEAKER_TURN_ON;
+						handle_mode(MODE_SET, &mode);
+					}
 
 				/* the B button
 				 * Just close the application, and let the radio plays

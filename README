@@ -14,8 +14,7 @@ USING
 	R     -> Seek next radio station from the current frequency
 	L     -> Seek previous radio station from the current frequency
 	B     -> Run in background. You can do anything, and still listen the radio!
-	Y     -> Turn on Headphone to listen the radio and turn off speakers
-	A     -> Turn on Speakers to listen radio and turn off headphones
+	Y     -> Switch between Headphone Speakers to listen radio
 
   There is a shortcut bar in the bottom of the screen, that shows this controls.
 ---------------------------------------------------------
