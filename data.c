@@ -171,22 +171,8 @@ static void write_favradios()
 		int i;
 		for (i = 0; i < favrads.num_radios; i++)
 			fprintf(file, "%s\n", favrads.radio[i]);
-	}
-}
 
-static void sort_radio_stations()
-{
-	int i, j, k = favrads.num_radios - 1;
-
-	for (i = 0; i < favrads.num_radios; i++) {
-		for (j = 0; j < k; j++) {
-			if (atof(favrads.radio[j]) > atof(favrads.radio[j + 1])) {
-				char *aux = favrads.radio[j];
-				strcpy(favrads.radio[j], favrads.radio[j + 1]);
-				strcpy(favrads.radio[j + 1], aux);
-			}
-		}
-		k--;
+		fclose(file);
 	}
 }
 
@@ -208,18 +194,22 @@ void handle_fav_radios(int mode, char *value)
 
 			while ((read = getline(&line, &len, file)) != -1 && favrads.num_radios < 5) {
 				remove_new_line(line);
-				printf("Radio %s\n", line);
-				strncpy(favrads.radio[favrads.num_radios], line, strlen(line) + 1);
-				favrads.num_radios++;
+				strncpy(favrads.radio[favrads.num_radios++], line, strlen(line) + 1);
 			}
+			fclose(file);
+
 		} else if (mode == FILE_FAVRAD_WRITE) {
 			if (favrads.num_radios < 5) {
-				strcpy(favrads.radio[favrads.num_radios], value);
-				favrads.num_radios++;
-				sort_radio_stations();
+				strcpy(favrads.radio[favrads.num_radios++], value);
 				write_favradios();
 			}
 		} else if (mode == FILE_FAVRAD_DELETE) {
+			/*
+			int i;
+			for (i = 0; i < favrads.num_radios; i++)
+				if (!strncmp(favrads.radio[i], value, strlen(value)))
+					strcpy(favrads.radio[i], "0");
+			*/
 		}
 	}
 }

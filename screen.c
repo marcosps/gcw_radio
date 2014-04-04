@@ -373,6 +373,15 @@ int main(int argc, char* argv[])
 						handle_mode(MODE_SET, &mode);
 					}
 
+				/* X Button -> Add favorite radio */
+				} else if (!strcmp(button_pressed, "left shift")) {
+					char char_freq[6];
+					sprintf(char_freq, "%g", freq);
+					handle_fav_radios(FILE_FAVRAD_WRITE, char_freq);
+
+				/* A Button -> Remove favorite radio */
+				} else if (!strcmp(button_pressed, "left ctrl")) {
+
 				/* the B button
 				 * Just close the application, and let the radio plays
 				 * in background
