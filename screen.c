@@ -64,16 +64,6 @@ void apply_surface(int x, int y, SDL_Surface *font, SDL_Surface *screen)
 	SDL_Flip(screen);
 }
 
-/* Get the center of width and height */
-int get_center(int mode, char *freq, int size)
-{
-	if (mode == WIDTH_CENTER)
-		return (VOLUME_BAR_X_POS - strlen(freq)) / 2;
-	else if (mode == HEIGHT_CENTER)
-		return (HEIGHT - size) / 2;
-	return 0;
-}
-
 /* Initial position of each rectangle and init the colors */
 void setup_volume_bar()
 {
@@ -197,7 +187,7 @@ void print_freq(float freq, int searching)
 
 		freq_info = TTF_RenderText_Solid(freq_font, freq_char, scolor);
 	
-		apply_surface(line, get_center(HEIGHT_CENTER, freq_char, 28), freq_info, screen);
+		apply_surface(line, (HEIGHT - 28) / 2, freq_info, screen);
 	}
 }
 
