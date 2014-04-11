@@ -31,7 +31,7 @@ void handle_sound_level(int mode, long *volume);
 void handle_mode(int mode, int *value);
 
 /* handle favorite radios, ir we want to add or maybe remove radio stations */
-void handle_fav_radios(int mode, char *value);
+void handle_fav_radios(int mode, char *value, int pos);
 
 
 int set_home_path();

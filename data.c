@@ -176,7 +176,7 @@ static void write_favradios()
 	}
 }
 
-void handle_fav_radios(int mode, char *value)
+void handle_fav_radios(int mode, char *value, int pos)
 {
 	if (path[0] != '0') {
 		sprintf(aux_path, "%s/%s", path, "favorite_radios");
@@ -204,12 +204,11 @@ void handle_fav_radios(int mode, char *value)
 				write_favradios();
 			}
 		} else if (mode == FILE_FAVRAD_DELETE) {
-			/*
-			int i;
-			for (i = 0; i < favrads.num_radios; i++)
-				if (!strncmp(favrads.radio[i], value, strlen(value)))
-					strcpy(favrads.radio[i], "0");
-			*/
+			if (favrads.num_radios > 0 && pos < 5) {
+				strcpy(favrads.radio[pos], "0");
+				write_favradios();
+				favrads.num_radios--;
+			}
 		}
 	}
 }

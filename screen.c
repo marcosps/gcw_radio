@@ -52,6 +52,9 @@ SDL_Surface *screen;
  */
 int end_application = 1;
 
+/* Current fav radio selected */
+int curr_fav = 0;
+
 /* blit to the screen */
 void apply_surface(int x, int y, SDL_Surface *font, SDL_Surface *screen)
 {
@@ -293,7 +296,7 @@ int main(int argc, char* argv[])
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-	handle_fav_radios(FILE_FAVRAD_READ, NULL);
+	handle_fav_radios(FILE_FAVRAD_READ, NULL, 0);
 
 	while(!keypress) {
 		while(SDL_WaitEvent(&event)) {
@@ -333,6 +336,15 @@ int main(int argc, char* argv[])
 						handle_sound_level(FILE_VOLUME_WRITE, &vol);
 					}
 
+				/* Change to previous fav radio */
+				} else if (!strcmp(button_pressed, "left")) {
+					curr_fav = curr_fav <= 0 ? curr_fav - 1 : 0;
+
+				/* Change to next fav radio */
+				} else if (!strcmp(button_pressed, "right")) {
+					curr_fav = curr_fav >= 4 ? curr_fav : curr_fav + 1;
+
+
 				/* the R button -> Seek Next */
 				} else if (!strcmp(button_pressed, "backspace")) {
 					print_freq(freq, 1);
@@ -367,10 +379,11 @@ int main(int argc, char* argv[])
 				} else if (!strcmp(button_pressed, "left shift")) {
 					char char_freq[6];
 					sprintf(char_freq, "%g", freq);
-					handle_fav_radios(FILE_FAVRAD_WRITE, char_freq);
+					handle_fav_radios(FILE_FAVRAD_WRITE, char_freq, 0);
 
 				/* A Button -> Remove favorite radio */
 				} else if (!strcmp(button_pressed, "left ctrl")) {
+					handle_fav_radios(FILE_FAVRAD_DELETE, "", curr_fav);
 
 				/* the B button
 				 * Just close the application, and let the radio plays
