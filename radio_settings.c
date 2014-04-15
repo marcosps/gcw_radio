@@ -45,12 +45,25 @@ void init_controls(void)
 	seek.wrap_around = 1;
 }
 
-/* frequency in MHz */
-void setup(float frequency)
+void set_frequency(float frequency)
 {
 	/* convert MHz to Hz*/
 	int n_freq = (frequency * 1000000) / 62.5;
 
+	freq.tuner = 0;
+	freq.frequency = n_freq;
+	freq.type = V4L2_TUNER_RADIO;
+
+	if (ioctl(fd, VIDIOC_S_FREQUENCY, &freq) < 0) {
+		perror("ioctl: set frequency");
+		fprintf(stderr, "We can't continue without a frequency. Aborting.\n");
+		exit(1);
+	}
+}
+
+/* frequency in MHz */
+void setup(float frequency)
+{
 	control.id = V4L2_CID_AUDIO_MUTE;
 	control.value = 0;
 
@@ -66,15 +79,7 @@ void setup(float frequency)
 		exit(1);
 	}
 
-	freq.tuner = 0;
-	freq.frequency = n_freq;
-	freq.type = V4L2_TUNER_RADIO;
-
-	if (ioctl(fd, VIDIOC_S_FREQUENCY, &freq) < 0) {
-		perror("ioctl: set frequency");
-		fprintf(stderr, "We can't continue without a frequency. Aborting.\n");
-		exit(1);
-	}
+	set_frequency(frequency);
 
 	control.id = V4L2_CID_AUDIO_VOLUME;
 	control.value = 15;
