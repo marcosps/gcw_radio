@@ -351,7 +351,7 @@ int main(int argc, char* argv[])
 
 	/* Manage the ttf font */
 	load_ttf_font();
-	print_freq(curr_freq, 0);
+	show_seek_mode();
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
