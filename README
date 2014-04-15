@@ -6,15 +6,18 @@ Radio Player for GCW
 USING
 -----
   CONTROLS
-	UP    -> Increase volume
-	DOWN  -> Decrease volume
-	start -> Exit application
-	Hold  -> Lock screen
-	Power -> Unlock screen
-	R     -> Seek next radio station from the current frequency
-	L     -> Seek previous radio station from the current frequency
-	B     -> Run in background. You can do anything, and still listen the radio!
-	Y     -> Switch between Headphone Speakers to listen radio
+	UP             -> Increase volume
+	DOWN           -> Decrease volume
+	Start          -> Change Seek mode between automatic and manual
+	Select + Start -> Turn off
+	Hold           -> Lock screen
+	Power          -> Unlock screen
+	R              -> If the seek mode is automatic: Seek next radio station from the current frequency
+	                  If the seek mode is manual:    increments in .10 the current frequency
+	L              -> If the seek mode is automatic: Seek previous radio station from the current frequency
+	                  If the seek mode is manual:    decrements in .10 the current frequency
+	B              -> Run in background. You can do anything, and still listen the radio!
+	Y              -> Switch between Headphone Speakers to listen radio
 
   There is a shortcut bar in the bottom of the screen, that shows this controls.
 ---------------------------------------------------------
