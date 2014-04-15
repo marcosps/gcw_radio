@@ -45,6 +45,10 @@ SDL_Surface *freq_info = NULL;
 TTF_Font *shortcut_font = NULL;
 SDL_Surface *shortcut_info = NULL;
 
+
+TTF_Font *seek_mode_font = NULL;
+SDL_Surface *seek_mode_info = NULL;
+
 SDL_Surface *screen;
 
 /* Verify if the user want to listen radio in
@@ -52,8 +56,14 @@ SDL_Surface *screen;
  */
 int end_application = 1;
 
+/* Default seek mode is auto */
+int seek_mode = SEEK_AUTO;
+
 /* Current fav radio selected */
 int curr_fav = 0;
+
+/* currect frequency */
+float curr_freq = 0;
 
 /* blit to the screen */
 void apply_surface(int x, int y, SDL_Surface *font, SDL_Surface *screen)
@@ -144,6 +154,7 @@ void load_ttf_font()
 		fprintf(stderr, "Cannot find ttf Turk/28!\n");
 
 	shortcut_font = TTF_OpenFont("Fiery_Turk.ttf", 8);
+	seek_mode_font = TTF_OpenFont("Fiery_Turk.ttf", 14);
 
 	/* put all available shortcuts in the screen */
 	if (!shortcut_font)
@@ -151,11 +162,15 @@ void load_ttf_font()
 	else {
 		SDL_Color color = {255, 255, 255};
 
-		char *message = "Up: Vol+ | Down: Vol- | L: Seek Prv | R: Seek Next | Start: Exit";
+		char *message = "Up: Vol+ | Down: Vol- | L: Seek Prv | R: Seek Next | Sel+Start: Exit";
+		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
+		apply_surface(0, 200, shortcut_info, screen);
+
+		message = "B: Run in background | Y: Switch between Headphone or Speakers";
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 210, shortcut_info, screen);
 
-		message = "B: Run in background | Y: Switch between Headphone or Speakers";
+		message = "Start: Exchange seek mode";
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 220, shortcut_info, screen);
 	}
@@ -194,13 +209,57 @@ void print_freq(float freq, int searching)
 	}
 }
 
+static void get_next_frequency(int seek_type)
+{
+	if (seek_type == SEEK_UP) {
+		curr_freq += .10;
+		if (curr_freq > 108.0)
+			curr_freq = 78.0;
+	} else if (seek_type == SEEK_DOWN) {
+		curr_freq -= .10;
+		if (curr_freq < 76.5)
+			curr_freq = 108.0;
+	}
+}
+
+static void show_seek_mode()
+{
+	SDL_Color scolor = {255, 255, 255};
+
+	char smode[20];
+	int pos;
+
+	if (seek_mode == SEEK_MANUAL) {
+		strcpy(smode, "Seek manual");
+		pos = 123;
+	} else {
+		strcpy(smode, "Seek automatic");
+		pos = 113;
+	}
+	/* Remove the old seek mode from the screen */
+	SDL_Rect tmp_rect;
+	Uint32 color = SDL_MapRGB(screen->format, 0, 0, 0);
+
+	tmp_rect.x = tmp_rect.y = 0;
+	tmp_rect.w = VOLUME_BAR_X_POS;
+	tmp_rect.h = screen->h - 40; /* Don't clean the shortcut bar */
+
+	SDL_FillRect(screen, &tmp_rect, color);
+
+	// we need to repaint the frequency beucase we erase it when we 
+	// change the seek mode
+	print_freq(curr_freq, 0);
+
+	seek_mode_info = TTF_RenderText_Solid(seek_mode_font, smode, scolor);
+	apply_surface(pos, 150, seek_mode_info, screen);
+}
+
 int main(int argc, char* argv[])
 {
 	SDL_Event event;
   
 	int keypress = 0, lock = 0;
 	long vol, min, max, ret = 0;
-	float freq = 0;
 
 	char *button_pressed;
 
@@ -219,21 +278,21 @@ int main(int argc, char* argv[])
 	set_home_path();
 
 	/* get last radio station */
-	handle_user_freq(FILE_FREQ_READ, &freq);
+	handle_user_freq(FILE_FREQ_READ, &curr_freq);
 
-	if (freq == 0) {
+	if (curr_freq == 0) {
 		fprintf(stdout, "Using default radio 76.5\n");
-		freq = 76.5;
+		curr_freq = 76.5;
 		/* save as the default radio */
-		handle_user_freq(FILE_FREQ_WRITE, &freq);
+		handle_user_freq(FILE_FREQ_WRITE, &curr_freq);
 
 	} else {
-		if (freq < 76.5 || freq > 108.0) {
-			fprintf(stderr, "%s %f %s", "Frequency ", freq,
+		if (curr_freq < 76.5 || curr_freq > 108.0) {
+			fprintf(stderr, "%s %f %s", "Frequency ", curr_freq,
 					" out of range(76.5.9 <> 108.0)! Using the freq 76.5.\n");
-			freq = 76.5;
+			curr_freq = 76.5;
 			/* save as the default radio */
-			handle_user_freq(FILE_FREQ_WRITE, &freq); 
+			handle_user_freq(FILE_FREQ_WRITE, &curr_freq); 
 		}
 	}
 
@@ -273,7 +332,7 @@ int main(int argc, char* argv[])
          */
 	if (!ret) {
 		/* Initialize the radio by the driver */
-		setup(freq);
+		setup(curr_freq);
 
 		/* Set the flag to turn on the capture line */
 		mixer_control(mode, &vol, &min, &max);
@@ -292,7 +351,7 @@ int main(int argc, char* argv[])
 
 	/* Manage the ttf font */
 	load_ttf_font();
-	print_freq(freq, 0);
+	print_freq(curr_freq, 0);
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
@@ -347,17 +406,27 @@ int main(int argc, char* argv[])
 
 				/* the R button -> Seek Next */
 				} else if (!strcmp(button_pressed, "backspace")) {
-					print_freq(freq, 1);
-					freq = seek_radio_station(SEEK_UP);
-					print_freq(freq, 0);
-					handle_user_freq(FILE_FREQ_WRITE, &freq);
+					if (seek_mode == SEEK_AUTO) {
+						print_freq(curr_freq, 1);
+						curr_freq = seek_radio_station(SEEK_UP);
+					} else {
+						get_next_frequency(SEEK_UP);
+						set_frequency(curr_freq);
+					}
+					show_seek_mode();
+					handle_user_freq(FILE_FREQ_WRITE, &curr_freq);
 				
 				/* the L button -> Seek Previous */
 				} else if (!strcmp(button_pressed, "tab")) {
-					print_freq(freq, 1);
-					freq = seek_radio_station(SEEK_DOWN);
-					print_freq(freq, 0);
-					handle_user_freq(FILE_FREQ_WRITE, &freq);
+					if (seek_mode == SEEK_AUTO) {
+						print_freq(curr_freq, 1);
+						curr_freq = seek_radio_station(SEEK_DOWN);
+					} else {
+						get_next_frequency(SEEK_DOWN);
+						set_frequency(curr_freq);
+					}
+					show_seek_mode();
+					handle_user_freq(FILE_FREQ_WRITE, &curr_freq);
 
 				/* Y Button -> Switch between Headphone and Speaker */
 				} else if (!strcmp(button_pressed, "space")) {
@@ -378,7 +447,7 @@ int main(int argc, char* argv[])
 				/* X Button -> Add favorite radio */
 				} else if (!strcmp(button_pressed, "left shift")) {
 					char char_freq[6];
-					sprintf(char_freq, "%g", freq);
+					sprintf(char_freq, "%g", curr_freq);
 					handle_fav_radios(FILE_FAVRAD_WRITE, char_freq, 0);
 
 				/* A Button -> Remove favorite radio */
@@ -393,12 +462,20 @@ int main(int argc, char* argv[])
 					end_application = 0;
 					keypress = 1;
 
-				/* exit when start button is pressed */
+				/* exit when select + start button are pressed */
 				} else if (!strcmp(button_pressed, "return")) {
-					printf("The %s key was pressed!\n",
-        	           		SDL_GetKeyName(event.key.keysym.sym));
-					keypress = 1;
+					Uint8 *keyState = SDL_GetKeyState(NULL);
 
+					// if just start is pressed, we are changing the seek mode
+					if (keyState[SDLK_ESCAPE])
+						keypress = 1;
+					else {
+						if (seek_mode == SEEK_AUTO)
+							seek_mode = SEEK_MANUAL;
+						else
+							seek_mode = SEEK_AUTO;
+						show_seek_mode();
+					}
 				} else {
 					printf("The %s key was pressed!\n",
 					SDL_GetKeyName(event.key.keysym.sym));
