@@ -20,7 +20,7 @@ CFLAGS=-Wall -lasound -lSDL_image `$(SYSROOT)/usr/bin/sdl-config --cflags --libs
 LDFLAGS = -Wl,--gc-sections
 FILES=radio_settings.c screen.c data.c
 
-VERSION=v0.2.1
+VERSION=v0.3.1
 
 .PHONY: all bin build clean
 

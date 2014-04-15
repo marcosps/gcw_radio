@@ -2,6 +2,12 @@ Radio Player for GCW
 -----------------------
 	This application is a radio player for OpenDingux in GCW device.
 
+Changes of version 3.1
+--------------------
+	* Automatic/Manual seek modes
+	* To exit now we need to press Select + Start
+	* Start button now changes the seek mode
+
 -----
 USING
 -----
