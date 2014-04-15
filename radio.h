@@ -14,6 +14,7 @@
  */
 
 void setup(float frequency);
+void set_frequency(float frequency);
 void set_down(void);
 
 void mixer_control(int mode, long *volume, long *min, long *max);
@@ -44,6 +45,8 @@ enum modes {
 	HEIGHT_CENTER,
 	SEEK_UP,
 	SEEK_DOWN,
+	SEEK_AUTO,
+	SEEK_MANUAL
 };
 
 struct radios {
