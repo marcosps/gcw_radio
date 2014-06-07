@@ -33,8 +33,6 @@
 
 #define VOLUME_BAR_X_POS (WIDTH - VOLUME_RECT_WIDTH)
 
-#define HALF(string, wh, size) ((size - (strlen(string) * wh)) / 2)
-
 /* All rectangles of volume control */
 SDL_Rect rects[32];
 int colors[32][3];
@@ -44,7 +42,6 @@ SDL_Surface *freq_info = NULL;
 
 TTF_Font *shortcut_font = NULL;
 SDL_Surface *shortcut_info = NULL;
-
 
 TTF_Font *seek_mode_font = NULL;
 SDL_Surface *seek_mode_info = NULL;
@@ -183,14 +180,13 @@ void print_freq(float freq, int searching)
 
 		/* Remove the old frequency from the screen */
 		SDL_Rect tmp_rect;
-		Uint32 color = SDL_MapRGB(screen->format, 0, 0, 0);
 
-		SDL_Color scolor = {255, 255, 255};
-
-		tmp_rect.x = tmp_rect.y = 0;
+		tmp_rect.x = 0;
+		tmp_rect.y = 50;
 		tmp_rect.w = VOLUME_BAR_X_POS;
-		tmp_rect.h = screen->h - 40; /* Don't clean the shortcut bar */
+		tmp_rect.h = 70;
 	
+		Uint32 color = SDL_MapRGB(screen->format, 0, 0, 0);
 		SDL_FillRect(screen, &tmp_rect, color);
 
 		int line = 138;
@@ -203,6 +199,7 @@ void print_freq(float freq, int searching)
 			strcpy(freq_char, "Searching...");
 		}
 
+		SDL_Color scolor = {255, 255, 255};
 		freq_info = TTF_RenderText_Solid(freq_font, freq_char, scolor);
 	
 		apply_surface(line, (HEIGHT - 28) / 2, freq_info, screen);
