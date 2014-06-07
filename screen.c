@@ -209,6 +209,7 @@ void print_freq(float freq, int searching)
 	}
 }
 
+/* Show frequency when seek mode is manual */
 static void get_next_frequency(int seek_type)
 {
 	if (seek_type == SEEK_UP) {
@@ -222,6 +223,7 @@ static void get_next_frequency(int seek_type)
 	}
 }
 
+/* Show the seek mode in the screen */
 static void show_seek_mode()
 {
 	SDL_Color scolor = {255, 255, 255};
