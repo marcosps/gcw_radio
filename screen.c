@@ -136,6 +136,8 @@ static void finish_app()
 
 	TTF_CloseFont(freq_font);
 	TTF_CloseFont(shortcut_font);
+	TTF_CloseFont(seek_mode_font);
+	TTF_CloseFont(fav_rad_font);
 	TTF_Quit();
 	SDL_Quit();
 
