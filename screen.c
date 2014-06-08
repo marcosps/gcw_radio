@@ -46,6 +46,9 @@ SDL_Surface *shortcut_info = NULL;
 TTF_Font *seek_mode_font = NULL;
 SDL_Surface *seek_mode_info = NULL;
 
+TTF_Font *fav_rad_font = NULL;
+SDL_Surface *fav_rad_info = NULL;
+
 SDL_Surface *screen;
 
 /* Verify if the user want to listen radio in
@@ -61,6 +64,9 @@ int curr_fav = 0;
 
 /* currect frequency */
 float curr_freq = 0;
+
+/* Font color used in all text rendered */
+static SDL_Color font_color = {255, 255, 255};
 
 /* blit to the screen */
 void apply_surface(int x, int y, SDL_Surface *font, SDL_Surface *screen)
@@ -152,6 +158,7 @@ void load_ttf_font()
 
 	shortcut_font = TTF_OpenFont("Fiery_Turk.ttf", 8);
 	seek_mode_font = TTF_OpenFont("Fiery_Turk.ttf", 14);
+	fav_rad_font = TTF_OpenFont("Fiery_Turk.ttf", 10);
 
 	/* put all available shortcuts in the screen */
 	if (!shortcut_font)
@@ -181,10 +188,10 @@ void print_freq(float freq, int searching)
 		/* Remove the old frequency from the screen */
 		SDL_Rect tmp_rect;
 
-		tmp_rect.x = 0;
-		tmp_rect.y = 50;
-		tmp_rect.w = VOLUME_BAR_X_POS;
-		tmp_rect.h = 70;
+		tmp_rect.x = 80;
+		tmp_rect.y = 100;
+		tmp_rect.w = 200;
+		tmp_rect.h = 50;
 	
 		Uint32 color = SDL_MapRGB(screen->format, 0, 0, 0);
 		SDL_FillRect(screen, &tmp_rect, color);
@@ -199,8 +206,7 @@ void print_freq(float freq, int searching)
 			strcpy(freq_char, "Searching...");
 		}
 
-		SDL_Color scolor = {255, 255, 255};
-		freq_info = TTF_RenderText_Solid(freq_font, freq_char, scolor);
+		freq_info = TTF_RenderText_Solid(freq_font, freq_char, font_color);
 	
 		apply_surface(line, (HEIGHT - 28) / 2, freq_info, screen);
 	}
@@ -220,11 +226,15 @@ static void get_next_frequency(int seek_type)
 	}
 }
 
+static void draw_favrads_label()
+{
+	fav_rad_info = TTF_RenderText_Solid(fav_rad_font, "Favorite Radios", font_color);
+	apply_surface(0, 0, fav_rad_info, screen);
+}
+
 /* Show the seek mode in the screen */
 static void show_seek_mode()
 {
-	SDL_Color scolor = {255, 255, 255};
-
 	char smode[20];
 	int pos;
 
@@ -235,21 +245,19 @@ static void show_seek_mode()
 		strcpy(smode, "Seek automatic");
 		pos = 113;
 	}
+
 	/* Remove the old seek mode from the screen */
 	SDL_Rect tmp_rect;
 	Uint32 color = SDL_MapRGB(screen->format, 0, 0, 0);
 
-	tmp_rect.x = tmp_rect.y = 0;
-	tmp_rect.w = VOLUME_BAR_X_POS;
-	tmp_rect.h = screen->h - 40; /* Don't clean the shortcut bar */
+	tmp_rect.x = 100;
+	tmp_rect.y = 150;
+	tmp_rect.w = 140;
+	tmp_rect.h = 40;
 
 	SDL_FillRect(screen, &tmp_rect, color);
 
-	// we need to repaint the frequency beucase we erase it when we 
-	// change the seek mode
-	print_freq(curr_freq, 0);
-
-	seek_mode_info = TTF_RenderText_Solid(seek_mode_font, smode, scolor);
+	seek_mode_info = TTF_RenderText_Solid(seek_mode_font, smode, font_color);
 	apply_surface(pos, 150, seek_mode_info, screen);
 }
 
@@ -350,6 +358,8 @@ int main(int argc, char* argv[])
 
 	/* Manage the ttf font */
 	load_ttf_font();
+	draw_favrads_label();
+	print_freq(curr_freq, 0);
 	show_seek_mode();
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -412,6 +422,7 @@ int main(int argc, char* argv[])
 						get_next_frequency(SEEK_UP);
 						set_frequency(curr_freq);
 					}
+					print_freq(curr_freq, 0);
 					show_seek_mode();
 					handle_user_freq(FILE_FREQ_WRITE, &curr_freq);
 				
@@ -424,6 +435,7 @@ int main(int argc, char* argv[])
 						get_next_frequency(SEEK_DOWN);
 						set_frequency(curr_freq);
 					}
+					print_freq(curr_freq, 0);
 					show_seek_mode();
 					handle_user_freq(FILE_FREQ_WRITE, &curr_freq);
 
