@@ -49,6 +49,9 @@ SDL_Surface *seek_mode_info = NULL;
 TTF_Font *fav_rad_font = NULL;
 SDL_Surface *fav_rad_info = NULL;
 
+TTF_Font *desc_fav_rad_font = NULL;
+SDL_Surface *desc_fav_rad_info = NULL;
+
 SDL_Surface *screen;
 
 /* Verify if the user want to listen radio in
@@ -178,6 +181,7 @@ void load_ttf_font()
 	shortcut_font = TTF_OpenFont("Fiery_Turk.ttf", 8);
 	seek_mode_font = TTF_OpenFont("Fiery_Turk.ttf", 14);
 	fav_rad_font = TTF_OpenFont("Fiery_Turk.ttf", 10);
+	desc_fav_rad_font = TTF_OpenFont("Fiery_Turk.ttf", 10);
 
 	/* put all available shortcuts in the screen */
 	if (!shortcut_font)
@@ -263,6 +267,21 @@ static void draw_favrads_rects()
 			SDL_FillRect(screen, &favrad_rects[i], white_color);
 
 		SDL_FillRect(screen, &favrad_rects_border[i], black_color);
+
+		printf("Radio %s\n", favrads.radio[i]);
+
+		int freq_size = strlen(favrads.radio[i]);
+
+		char freq[6];
+
+		if (freq_size == 1)
+			strcpy(freq, "-");
+		else
+			strcpy(freq, favrads.radio[i]);
+
+		/* Draw favorite radio into rect */
+		desc_fav_rad_info = TTF_RenderText_Solid(desc_fav_rad_font, freq, font_color);
+		apply_surface(favrad_rects[i].x + 10, 35, desc_fav_rad_info, screen);
 	}
 	SDL_Flip(screen);
 }
@@ -271,8 +290,6 @@ static void draw_favrads_label()
 {
 	fav_rad_info = TTF_RenderText_Solid(fav_rad_font, "Favorite Radios", font_color);
 	apply_surface(0, 0, fav_rad_info, screen);
-
-	draw_favrads_rects();
 }
 
 /* Show the seek mode in the screen */
@@ -399,15 +416,16 @@ int main(int argc, char* argv[])
 	/* Draw the volume bar at the init */
 	draw_volume_bar(screen, vol, STARTUP);
 
+	handle_fav_radios(FILE_FAVRAD_READ, NULL, 0);
+
 	/* Manage the ttf font */
 	load_ttf_font();
 	draw_favrads_label();
 	print_freq(curr_freq, 0);
 	show_seek_mode();
+	draw_favrads_rects();
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-
-	handle_fav_radios(FILE_FAVRAD_READ, NULL, 0);
 
 	while(!keypress) {
 		while(SDL_WaitEvent(&event)) {
@@ -450,13 +468,11 @@ int main(int argc, char* argv[])
 				/* Change to previous fav radio */
 				} else if (!strcmp(button_pressed, "left")) {
 					curr_fav = curr_fav > 0 ? curr_fav - 1 : 0;
-					printf("Curr radio %d\n", curr_fav);
 					draw_favrads_rects();
 
 				/* Change to next fav radio */
 				} else if (!strcmp(button_pressed, "right")) {
 					curr_fav = curr_fav >= 4 ? curr_fav : curr_fav + 1;
-					printf("Curr radio %d\n", curr_fav);
 					draw_favrads_rects();
 
 				/* the R button -> Seek Next */
@@ -504,12 +520,14 @@ int main(int argc, char* argv[])
 				/* X Button -> Add favorite radio */
 				} else if (!strcmp(button_pressed, "left shift")) {
 					char char_freq[6];
-					sprintf(char_freq, "%g", curr_freq);
-					handle_fav_radios(FILE_FAVRAD_WRITE, char_freq, 0);
+					sprintf(char_freq, "%.1f", curr_freq);
+					handle_fav_radios(FILE_FAVRAD_WRITE, char_freq, curr_fav);
+					draw_favrads_rects();
 
 				/* A Button -> Remove favorite radio */
 				} else if (!strcmp(button_pressed, "left ctrl")) {
-					handle_fav_radios(FILE_FAVRAD_DELETE, "", curr_fav);
+					handle_fav_radios(FILE_FAVRAD_DELETE, "0", curr_fav);
+					draw_favrads_rects();
 
 				/* the B button
 				 * Just close the application, and let the radio plays
@@ -518,6 +536,15 @@ int main(int argc, char* argv[])
 				} else if (!strcmp(button_pressed, "left alt")) {
 					end_application = 0;
 					keypress = 1;
+
+				/* Choose favorite radio */
+				} else if (!strcmp(button_pressed, "escape")) {
+					if (strcmp(favrads.radio[curr_fav], "0")) {
+						curr_freq = atof(favrads.radio[curr_fav]);
+						set_frequency(curr_freq);
+						print_freq(curr_freq, 0);
+						handle_user_freq(FILE_FREQ_WRITE, &curr_freq);
+					}
 
 				/* exit when select + start button are pressed */
 				} else if (!strcmp(button_pressed, "return")) {

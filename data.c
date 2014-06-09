@@ -169,7 +169,7 @@ static void write_favradios()
 
 	if (file) {
 		int i;
-		for (i = 0; i < favrads.num_radios; i++)
+		for (i = 0; i < 5; i++)
 			fprintf(file, "%s\n", favrads.radio[i]);
 
 		fclose(file);
@@ -199,16 +199,12 @@ void handle_fav_radios(int mode, char *value, int pos)
 			fclose(file);
 
 		} else if (mode == FILE_FAVRAD_WRITE) {
-			if (favrads.num_radios < 5) {
-				strcpy(favrads.radio[favrads.num_radios++], value);
-				write_favradios();
-			}
+			strcpy(favrads.radio[pos], value);
+			write_favradios();
 		} else if (mode == FILE_FAVRAD_DELETE) {
-			if (favrads.num_radios > 0 && pos < 5) {
-				strcpy(favrads.radio[pos], "0");
-				write_favradios();
-				favrads.num_radios--;
-			}
+			strcpy(favrads.radio[pos], "0");
+			write_favradios();
+			favrads.num_radios--;
 		}
 	}
 }
