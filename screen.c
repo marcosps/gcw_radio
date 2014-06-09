@@ -68,6 +68,23 @@ float curr_freq = 0;
 /* Font color used in all text rendered */
 static SDL_Color font_color = {255, 255, 255};
 
+/* All rects to show favorite radios */
+static SDL_Rect favrad_rects[5] = {
+					{.x = 10, .y = 30, .w = 50, .h = 30},
+					{.x = 65, .y = 30, .w = 50, .h = 30},
+					{.x = 120, .y = 30, .w = 50, .h = 30},
+					{.x = 175, .y = 30, .w = 50, .h = 30},
+					{.x = 230, .y = 30, .w = 50, .h = 30}
+};
+
+static SDL_Rect favrad_rects_border[5] = {
+					{.x = 12, .y = 32, .w = 46, .h = 26},
+					{.x = 67, .y = 32, .w = 46, .h = 26},
+					{.x = 122, .y = 32, .w = 46, .h = 26},
+					{.x = 177, .y = 32, .w = 46, .h = 26},
+					{.x = 232, .y = 32, .w = 46, .h = 26}
+};
+
 /* blit to the screen */
 void apply_surface(int x, int y, SDL_Surface *font, SDL_Surface *screen)
 {
@@ -228,10 +245,33 @@ static void get_next_frequency(int seek_type)
 	}
 }
 
+/* To be able to draw borders, we need to draw a bigger rect, and after a small one
+ * filled by black color */
+static void draw_favrads_rects()
+{
+	Uint32 black_color = SDL_MapRGB(screen->format, 0, 0, 0);
+	Uint32 green_color = SDL_MapRGB(screen->format, 0, 255, 0);
+	Uint32 white_color = SDL_MapRGB(screen->format, 255, 255, 255);
+
+	int i = 0;
+
+	for (i = 0; i < 5; i++) {
+		/* Selected favorite radio has green border */
+		if (i == curr_fav)
+			SDL_FillRect(screen, &favrad_rects[i], green_color);
+		else
+			SDL_FillRect(screen, &favrad_rects[i], white_color);
+
+		SDL_FillRect(screen, &favrad_rects_border[i], black_color);
+	}
+}
+
 static void draw_favrads_label()
 {
 	fav_rad_info = TTF_RenderText_Solid(fav_rad_font, "Favorite Radios", font_color);
 	apply_surface(0, 0, fav_rad_info, screen);
+
+	draw_favrads_rects();
 }
 
 /* Show the seek mode in the screen */
@@ -409,11 +449,14 @@ int main(int argc, char* argv[])
 				/* Change to previous fav radio */
 				} else if (!strcmp(button_pressed, "left")) {
 					curr_fav = curr_fav <= 0 ? curr_fav - 1 : 0;
+					printf("Curr radio %d\n", curr_fav);
+					draw_favrads_rects();
 
 				/* Change to next fav radio */
 				} else if (!strcmp(button_pressed, "right")) {
 					curr_fav = curr_fav >= 4 ? curr_fav : curr_fav + 1;
-
+					printf("Curr radio %d\n", curr_fav);
+					draw_favrads_rects();
 
 				/* the R button -> Seek Next */
 				} else if (!strcmp(button_pressed, "backspace")) {
