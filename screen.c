@@ -264,6 +264,7 @@ static void draw_favrads_rects()
 
 		SDL_FillRect(screen, &favrad_rects_border[i], black_color);
 	}
+	SDL_Flip(screen);
 }
 
 static void draw_favrads_label()
@@ -448,7 +449,7 @@ int main(int argc, char* argv[])
 
 				/* Change to previous fav radio */
 				} else if (!strcmp(button_pressed, "left")) {
-					curr_fav = curr_fav <= 0 ? curr_fav - 1 : 0;
+					curr_fav = curr_fav > 0 ? curr_fav - 1 : 0;
 					printf("Curr radio %d\n", curr_fav);
 					draw_favrads_rects();
 
