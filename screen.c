@@ -158,6 +158,7 @@ static void finish_app()
 	TTF_CloseFont(shortcut_font);
 	TTF_CloseFont(seek_mode_font);
 	TTF_CloseFont(fav_rad_font);
+
 	TTF_Quit();
 	SDL_Quit();
 
@@ -191,13 +192,17 @@ void load_ttf_font()
 
 		char *message = "Up: Vol+ | Down: Vol- | L: Seek Prv | R: Seek Next | Sel+Start: Exit";
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
-		apply_surface(0, 200, shortcut_info, screen);
+		apply_surface(0, 190, shortcut_info, screen);
 
 		message = "B: Run in background | Y: Switch between Headphone or Speakers";
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
+		apply_surface(0, 200, shortcut_info, screen);
+
+		message = "Start: Change seek mode | X: Add favo radio | A: Rem favo radio";
+		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 210, shortcut_info, screen);
 
-		message = "Start: Exchange seek mode";
+		message = "Select: Set favorite radio to play";
 		shortcut_info = TTF_RenderText_Solid(shortcut_font, message, color);
 		apply_surface(0, 220, shortcut_info, screen);
 	}

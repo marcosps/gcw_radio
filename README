@@ -24,6 +24,9 @@ USING
 	                  If the seek mode is manual:    decrements in .10 the current frequency
 	B              -> Run in background. You can do anything, and still listen the radio!
 	Y              -> Switch between Headphone Speakers to listen radio
+	X              -> Add favorite radio to favorite radio list
+	A              -> Remove favorite radio to favorite radio list
+	Select         -> Set radio from select favorite radio
 
   There is a shortcut bar in the bottom of the screen, that shows this controls.
 ---------------------------------------------------------
