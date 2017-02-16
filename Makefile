@@ -16,7 +16,7 @@ CC=mipsel-linux-gcc
 SYSROOT=$(shell $(CC) --print-sysroot)
 CFLAGS=-Wall -lasound -lSDL_image `$(SYSROOT)/usr/bin/sdl-config --cflags --libs` \
 	-lSDL_ttf -O2 -fomit-frame-pointer -ffunction-sections -ffast-math \
-	-fsingle-precision-constant -G0 -g
+	-fsingle-precision-constant -g
 LDFLAGS = -Wl,--gc-sections
 FILES=radio_settings.c screen.c data.c
 
